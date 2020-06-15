@@ -1,0 +1,11 @@
+asgiref==3.2.7
+autopep8==1.5.3
+Django==3.0.7
+pdf2image==1.13.1
+Pillow==7.1.2
+pkg-resources==0.0.0
+pycodestyle==2.6.0
+pytesseract==0.3.4
+pytz==2020.1
+sqlparse==0.3.1
+toml==0.10.1
