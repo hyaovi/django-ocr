@@ -42,20 +42,20 @@ def convert_pdf(pdf_path):
 def handle_extraction(filepath, lang='eng'):
     try:
         print(filepath)
-        im = Image.open(filepath)
-        im = im.convert('RGB')
-        im = im.filter(ImageFilter.SHARPEN)
-        text = text_extract(im, lang=lang)
+        img = Image.open(filepath)
+        img = img.convert('RGB')
+        img = img.filter(ImageFilter.SHARPEN)
+        text = text_extract(img, lang=lang)
         return text
     except IOError as err:
         return 'err'
 
 
-if __name__ == "__main__":
-    pass
-    # file_path = sys.argv[1]
-    # print(file_path)
+def handle_pdf_file(filepath, lang):
+    pages = convert_from_path(filepath, 500)
+    results = []
+    for page in pages:
+        results.append(text_extract(page, lang))
 
-    # pdf = image_processor(file_path)
-    # with open('res.txt', 'w') as f:
-    #     f.write(pdf)
+    text = '\n \n ==== Page ===== \n \n'.join(results)
+    return text
