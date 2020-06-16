@@ -6,11 +6,11 @@ from django.shortcuts import render, redirect
 
 from .forms import UserFileForm, FileModelForm
 from .models import FileModel
-from .ocr_engine import handle_extraction
+from .ocr_engine import handle_extraction, handle_pdf_file
 
 
 def homepage(request):
-
+    context = {'form': UserFileForm()}
     if request.method == 'POST':
         user_input = UserFileForm(request.POST, request.FILES)
         if user_input.is_valid():
@@ -20,18 +20,22 @@ def homepage(request):
 
             text = handle_file(
                 request.FILES['user_file'], ext, lang)
-            return render(request, 'ocr/index.html', {'text': text})
+            context['text'] = text
+            return render(request, 'ocr/index.html', context)
 
-    user_form = UserFileForm()
-    context = {'form': user_form}
     return render(request, 'ocr/index.html', context)
 
 
 def handle_file(f, ext, lang='eng'):
     filename = 'temp.%s' % ext
+    text = ''
     with open(filename, 'wb+') as temp:
         for chunk in f.chunks():
             temp.write(chunk)
     abs_file_path = os.path.abspath(filename)
-    text = handle_extraction(abs_file_path, lang)
+    if ext.strip().lower() == 'pdf':
+        text = handle_pdf_file(abs_file_path, lang)
+    else:
+        text = handle_extraction(abs_file_path, lang)
+    os.remove(abs_file_path)
     return text

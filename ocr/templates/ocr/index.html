@@ -13,7 +13,6 @@
         <p class="lead">
           Extract text from PDF and images (JPG, BMP, TIFF, GIF) and convert into editable Word, and Text output formats
         </p>
-
         <form action="" method='post' enctype="multipart/form-data">
           {% csrf_token %}
           {% for input in form  %}
@@ -22,10 +21,14 @@
             {{input}}
           </div>
           {% endfor %}
+          {% ifequal text "err" %}
+          <div class="alert alert-danger" role="alert">
+            something when wrong
+          </div>
+          {% endifequal %}
           <button class="btn btn-custom btn-cta">
-            Upload file
+            Extract text
           </button>
-          {% comment %} {% if text=="err" %}<p>some went wrong</p>{% endif %} {% endcomment %}
         </form>
 
       </div>
