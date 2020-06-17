@@ -33,3 +33,10 @@ class UserFileForm (forms.Form):
         super().__init__(*args, **kwargs)
         self.fields['user_file'].widget.attrs.update(
             {'class': 'form-control custom-file'})
+
+    def clean_userfile(self):
+        fileobj = self.cleaned_data['user_file']
+        if not fileobj.endswith(('pdf', 'jpg', 'png', 'jpeg', 'tiff')):
+            raise forms.ValidationError('unsupported file type')
+
+        return fileobj

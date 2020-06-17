@@ -21,11 +21,11 @@
             {{input}}
           </div>
           {% endfor %}
-          {% ifequal text "err" %}
+          {% if text is None %}
           <div class="alert alert-danger" role="alert">
             something when wrong
           </div>
-          {% endifequal %}
+          {% endif %}
           <button class="btn btn-custom btn-cta">
             Extract text
           </button>

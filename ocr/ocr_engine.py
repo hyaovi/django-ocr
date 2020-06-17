@@ -1,61 +1,29 @@
-import sys
-import os
+
+from functools import partial
+from contextlib import suppress
 
 import pytesseract
 from PIL import ImageFilter, Image
-from pdf2image import convert_from_path
+from pdf2image import convert_from_bytes
 
 
-def user_input():
-    file_path = ''
-    lang = input('langage: eng,fra,rus, ukr: ')
-    ext = input('extension')
-    sharpened_image = image_processor(file_path)
-    text = text_extract(sharpened_image)
-    print(text)
-
-# Extract text from picture
-
-
-def text_extract(image_file, lang='eng'):
+def text_extract(lang, image_file):
     return pytesseract.image_to_string(image_file, lang=lang)
 
-# Sharpen picture for ocr extraction
 
+def handle_input(fileobj, multi=False):
+    if multi:
+        yield from convert_from_bytes(fileobj.read(), 500)
 
-def image_processor(image_path):
-    image = None
-    if isinstance(image_path, str):
-        image = Image.open(image_path)
-
-    else:
-        image = Image.frombytes('RGBA', (128, 128), image_path, 'raw')
-
-    return image.filter(ImageFilter.SHARPEN)
-
-
-def convert_pdf(pdf_path):
-    images_from_pdf = convert_from_path(pdf_path)
-    return images_from_pdf
-
-
-def handle_extraction(filepath, lang='eng'):
-    try:
-        print(filepath)
-        img = Image.open(filepath)
+    with suppress(IOError):
+        img = Image.open(fileobj)
         img = img.convert('RGB')
         img = img.filter(ImageFilter.SHARPEN)
-        text = text_extract(img, lang=lang)
-        return text
-    except IOError as err:
-        return 'err'
+        # text = text_extract(lang, img)
+        yield img
 
 
-def handle_pdf_file(filepath, lang):
-    pages = convert_from_path(filepath, 500)
-    results = []
-    for page in pages:
-        results.append(text_extract(page, lang))
-
-    text = '\n \n ==== Page ===== \n \n'.join(results)
-    return text
+def get_text(fileobj, lang, multi):
+    extract = partial(text_extract, lang)
+    results = map(extract, handle_input(fileobj, multi))
+    return ''.join(results)
