@@ -2,6 +2,7 @@
 
 Django based Optical character recognition (OCR)
 
+![Django-ocr screenshot](https://github.com/hyaovi/django-ocr/blob/master/preview.png)
 Extract text from PDF and images (JPG, BMP, TIFF, GIF) and convert into editable Word, and Text output formats
 
 It was created using [Flask](https://flask.palletsprojects.com/en/1.1.x/).
