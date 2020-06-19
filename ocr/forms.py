@@ -25,18 +25,19 @@ class FileModelForm(forms.ModelForm):
 
 
 class UserFileForm (forms.Form):
-    user_file = forms.FileField(label='Select a file')
+    userfile = forms.FileField(label='Select a file')
     lang = forms.ChoiceField(label='Select a language', choices=models.LANG_LIST,  widget=forms.Select(
         attrs={'class': 'form-control custom-select'}))
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.fields['user_file'].widget.attrs.update(
+        self.fields['userfile'].widget.attrs.update(
             {'class': 'form-control custom-file'})
 
     def clean_userfile(self):
-        fileobj = self.cleaned_data['user_file']
-        if not fileobj.endswith(('pdf', 'jpg', 'png', 'jpeg', 'tiff')):
+        fileobj = self.cleaned_data['userfile']
+        print(fileobj)
+        if not fileobj.__str__().endswith(('pdf', 'jpg', 'png', 'jpeg', 'tiff')):
             raise forms.ValidationError('unsupported file type')
 
         return fileobj

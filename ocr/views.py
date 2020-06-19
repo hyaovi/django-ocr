@@ -10,7 +10,7 @@ def homepage(request):
     if request.method == 'POST':
         user_input = UserFileForm(request.POST, request.FILES)
         if user_input.is_valid():
-            fileobj = request.FILES['user_file']
+            fileobj = request.FILES['userfile']
             lang = user_input.cleaned_data['lang']
             is_image = fileobj.name.endswith(('jpg', 'png', 'jpeg', 'tiff'))
             if is_image:
@@ -19,6 +19,9 @@ def homepage(request):
                 multi = True
             text = get_text(fileobj, lang, multi)
             context['text'] = text
+            return render(request, 'ocr/index.html', context)
+        else:
+            context['form_error'] = 'Error! File can not be converted for recognition'
             return render(request, 'ocr/index.html', context)
 
     return render(request, 'ocr/index.html', context)
