@@ -6,19 +6,199 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>FREE ONLINE OCR SERVICE</title>
+
+       <style>
+.bgcolor {
+border-color: white;
+border-width: 0px 0px 0.1px 0px;
+border-style: solid;
+background: #424767;
+}
+.bgfont{
+color:white;
+}
+.navbar-toggler-icon1 {
+display: inline-block;
+width: 1.5em;
+height: 2px;
+vertical-align: middle;
+content: "";
+background: white;
+/* background: no-repeat center center; */
+background-size: 100% 100%;
+}
+#navbar-toggler1 {
+    line-height: 0.3;
+    padding-bottom: 10px;
+    border: solid;
+    border-width: 2px;
+    border-color:white;
+}
+        {% block style %} {% endblock %}
+    </style>
+
+
   {% comment %} Bootstrap {% endcomment %}
   <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css"
     integrity="sha384-9aIt2nRpC12Uk9gS9baDl411NQApFmC26EwAOH8WgZl5MYYxFfc+NcPb1dKGj7Sk" crossorigin="anonymous">
   <link rel="stylesheet" href="{% static 'ocr/css/style.css' %}">
+
+   <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <title>{%block title%}{%endblock%}</title>
+        <meta name="description" content="">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+        <link rel="stylesheet" href="">
+
 </head>
 
+
 <body>
-  <header>
-    {% include './navbar.html' %}
-  </header>
-  <main class="container-fluid">
-    {%block content %}
-    {%endblock content %}</main>
+  <body style="background-color: #ececec">
+       <nav class="navbar navbar-expand-lg bgcolor">
+  <a class="navbar-brand bgfont" href="#">Django-ocr app</a>
+  <button class="navbar-toggler " id="navbar-toggler1" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+    <span class="navbar-toggler-icon1"></span><br>
+          <span class="navbar-toggler-icon1"></span><br>
+          <span class="navbar-toggler-icon1"></span>
+
+  </button>
+  <div class="collapse navbar-collapse" id="navbarNav">
+    <ul class="navbar-nav">
+      <li class="nav-item active">
+        <a class="nav-link bgfont" href="/">Home<span class="sr-only">(current)</span></a>
+      </li>
+       <li class="nav-item active">
+        <a class="nav-link bgfont" href="/contactus">Contact Us<span class="sr-only">(current)</span></a>
+      </li>
+       
+    </ul>
+
+{% comment %} //chekcking user is authenticated or not {% endcomment %}
+{% if user.is_authenticated %}
+<ul class="navbar-nav ml-auto mr-5">
+
+     <li class="nav-item dropdown">
+        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+         {{request.user}}
+        </a>
+        <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+         <span class="dropdown-item" ></span>
+         <a class="dropdown-item" href="reset_password/">Change Password</a>
+          <a class="dropdown-item" href="/logout">Logout</a>
+        </div>
+      </li>
+      </ul>
+      </div>
+{% else %}
+  <!-- Button to  trigger Login modal -->
+
+  <div class="ml-auto">
+<button type="button" class="btn btn-success mr-2" data-toggle="modal" data-target="#loginModal">
+Login
+</button>
+
+<button type="button" class="btn btn-success mr-2 " data-toggle="modal" data-target="#signupModal">
+SignUp
+</button>
+</div>
+{% endif %}
+  </div>
+</nav>
+
+<!-- Showing all msg below navbar -->
+
+{% if messages %}
+<ul class="messages">
+    {% for message in messages %}
+    <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
+    {% endfor %}
+</ul>
+{% endif %}
+
+
+<!-- SignUp Modal -->
+
+<div class="modal fade" id="signupModal" tabindex="-1" aria-labelledby="signupModal" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="signupModalTitle">SignUp Here</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <form action= "/signup" method='post'>
+  <div class="form-group">
+    <label for="username">Username</label>
+    <input type="text" class="form-control" id="username" name="username" placeholder="Choose a unique username">
+  </div>
+  <div class="form-group">
+    <label for="fname">First Name</label>
+    <input type="text" class="form-control" id="fname" name="fname" placeholder="Enter Your First Name">
+  </div>
+  <div class="form-group">
+    <label for="lname">Last Name</label>
+    <input type="text" class="form-control" id="lname" name="lname" placeholder="Enter Your Last Name">
+  </div>
+  <div class="form-group">
+    <label for="email">Email address</label>
+    <input type="email" class="form-control" id="email" name="email" placeholder="name@example.com">
+  </div>
+  <div class="form-group">
+    <label for="pass1">Choose a password</label>
+    <input type="password" class="form-control" id="pass1" name="pass1" placeholder="Choose Your Password">
+  </div>
+  <div class="form-group">
+    <label for="pass2">Confirm Password</label>
+    <input type="password" class="form-control" id="pass2" name="pass2" placeholder="Enter your password again">
+  </div>
+
+
+        {% csrf_token %}
+        <button type="submit" class="btn btn-primary">Submit</button>
+</form>
+      </div>
+      <div class="modal-footer">
+      </div>
+    </div>
+  </div>
+</div>
+
+
+{% block content %}{% endblock %}
+
+
+<!-- Login Modal -->
+<div class="modal fade" id="loginModal" tabindex="-1" aria-labelledby="loginModal" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="loginModalTitle">Login Here</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <form action= "/login" method='post'>
+  <div class="form-group">
+    <label for="username">Username</label>
+    <input type="text" class="form-control" id="loginusername" name="loginusername" placeholder="Choose a unique username">
+  </div>
+  <div class="form-group">
+    <label for="pass">Enter your password </label>
+    <input type="password" class="form-control" id="loginpassword" name="loginpassword" placeholder="Enter your password ">
+  </div>
+ {% csrf_token %}
+        <button type="submit" class="btn btn-primary">Submit</button>
+</form>
+<a href="reset_password/">Forgot password?</a>
+      </div>
+       <div class="modal-footer">
+      </div>
+
 </body>
 
 {% comment %} Bootstrap JS {% endcomment %}
