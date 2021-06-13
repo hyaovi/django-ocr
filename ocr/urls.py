@@ -12,7 +12,7 @@ urlpatterns = [
     path("signup",views.userSignup,name='userSignup'),
 
     path('download_my_pdf', views.download_pdf,name='downloadfile'),
-    path('contactus', views.ContactUs,name='contactUs'),
+    path('contactus', views.Contact,name='contactUs'),
 
     #password reset urls
     path("reset_password/",auth_views.PasswordResetView.as_view(template_name="ocr/reset_password.html"), name="reset_password"),

@@ -1,32 +1,42 @@
+#all bugs
+#document and pdf not download encoding error in some images
+#show error if found error in extracting the text
+#all text dosen't come in pdf file
+
+
 from django.shortcuts import render, redirect
 from .forms import UserFileForm, FileModelForm
-from .models import FileModel
+from .models import FileModel,ContactUs
 from .ocr_engine import get_text
 from django.contrib.auth.models import User
 from django.contrib.auth import authenticate,  login, logout
 from django.contrib.auth.forms import UserChangeForm
 from django.http import HttpResponse
 from django.contrib import messages
-from django.http import HttpResponse
 from wsgiref.util import FileWrapper
-from ocr.models import ContactUs
 import os
 from fpdf import FPDF
 from django.http import FileResponse
 from docx import Document
+import pytesseract as pt
+import PIL
+from PIL import Image
+pt.pytesseract.tesseract_cmd = r"C:\Program Files\Tesseract-OCR\tesseract.exe"
 #from googletrans import Translator
+
+#get text and serve to download in 3 file formates
 
 
 def download_pdf(request):
    file_data = request.POST["txtareaField"]
-   
    if request.POST.get("txt"):
        response = HttpResponse(file_data, content_type='application/text charset=utf-8')
        response['Content-Disposition'] = 'attachment; filename="download.txt"'
        return response
 
    if request.POST.get("pdf"):
-       os.remove("ocr/static/ocr/img/download.pdf")
+       if os.path.exists('ocr/static/ocr/img/download.pdf'):
+        os.remove("ocr/static/ocr/img/download.pdf")
        document=FPDF()
        document.add_page()
        document.set_font("Arial", size=15)
@@ -44,7 +54,8 @@ def download_pdf(request):
        return response
    
    if request.POST.get("docx"):
-       os.remove("ocr/static/ocr/img/download.docx")
+       if os.path.exists('ocr/static/ocr/img/download.docx'):
+        os.remove("ocr/static/ocr/img/download.docx")
        document = Document()
        document.add_paragraph(file_data, style='IntenseQuote')
        document.save('ocr/static/ocr/img/download.docx')
@@ -61,26 +72,27 @@ def homepage(request):
         bool="true"
     
     context = {'form': UserFileForm(),'bool':bool}
-    #if request.method == 'POST':
-        # user_input = UserFileForm(request.POST, request.FILES)
-        # if user_input.is_valid():
-        #     fileobj = request.FILES['userfile']
-        #     lang = user_input.cleaned_data['lang']
-        #     is_image = fileobj.name.endswith(('jpg', 'png', 'jpeg', 'tiff'))
-        #     if is_image:
-        #         multi = False
-        #     else:
-        #         multi = True
-        #     text = get_text(fileobj, lang, multi)
-    context['text'] = "hello shubham, testing word file"
-    return render(request, 'ocr/index.html', context)
-        #else:
-    context['form_error'] = 'Error! File can not be converted for recognition'
+    if request.method == 'POST':
+        user_input = UserFileForm(request.POST, request.FILES)
+        if user_input.is_valid():
+            fileobj = request.FILES['userfile']
+            lang = user_input.cleaned_data['lang']
+            is_image = fileobj.name.endswith(('jpg', 'png', 'jpeg', 'tiff'))
+            if is_image:
+                multi = False
+            else:
+                multi = True
+            #text = get_text(fileobj, lang, multi)
+
+            text = pt.image_to_string(Image.open(fileobj), lang='eng')
+            context['text'] = text
+            return render(request, 'ocr/index.html', context)
+        else:
+            context['form_error'] = 'Error! File can not be converted for recognition'
+            return render(request, 'ocr/index.html', context)
+
     return render(request, 'ocr/index.html', context)
 
-    
-    
-    return render(request, 'ocr/index.html', context)
 
 # handel user login reuest
 
@@ -139,15 +151,18 @@ def userSignup(request):
     else:
         return render(request, 'ocr/error404.html')
 
-def ContactUs(request):
-    if request.method == "POST":
-        name = request.POST.get('txtName')
-        email = request.POST.get('txtEmail')
-        phone = request.POST.get('txtPhone')
-        msg = request.POST.get('txtMsg')
-        print(name, email, phone, msg)
-        contact = ContactUs(name=name, email=email, phone=phone, desc=msg)
-        contact.save()
+#contact us model
+def Contact(request):
+    if request.method == 'POST':
+        form = ContactUs()
+        name = request.POST.get('name')
+        email = request.POST.get('email')
+        message = request.POST.get('message')
+
+        form.name = name
+        form.mail = email
+        form.message = message
+        form.save()
         messages.info(request, 'We got your query. we will look at soon.')
         return render(request,'ocr/contactus.html')
     return render(request,'ocr/contactus.html')

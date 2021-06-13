@@ -17,11 +17,11 @@ class FileModel(models.Model):
 # contact us model
 
 class ContactUs(models.Model):
-    msg_id = models.AutoField(primary_key=True)
-    name = models.CharField(max_length=50, default='')
-    email = models.CharField(max_length=50, default='')
-    phone = models.CharField(max_length=10, default='')
-    desc = models.TextField(default='')
-
+    
+    id = models.AutoField(primary_key=True)
+    name = models.CharField(max_length=50, default="")
+    mail = models.CharField(max_length=50, default="")
+    message = models.TextField(default="")
+    
     def __str__(self):
         return self.name
