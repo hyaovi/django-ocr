@@ -13,3 +13,15 @@ class FileModel(models.Model):
         max_length=20, choices=LANG_LIST, default='eng', blank=True)
     ocr_text = models.TextField(blank=True)
     submitted_at = models.DateTimeField(auto_now_add=True)
+
+# contact us model
+
+class ContactUs(models.Model):
+    msg_id = models.AutoField(primary_key=True)
+    name = models.CharField(max_length=50, default='')
+    email = models.CharField(max_length=50, default='')
+    phone = models.CharField(max_length=10, default='')
+    desc = models.TextField(default='')
+
+    def __str__(self):
+        return self.name

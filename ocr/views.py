@@ -9,24 +9,51 @@ from django.http import HttpResponse
 from django.contrib import messages
 from django.http import HttpResponse
 from wsgiref.util import FileWrapper
+from ocr.models import ContactUs
 import os
+from fpdf import FPDF
+from django.http import FileResponse
+from docx import Document
 #from googletrans import Translator
 
+
 def download_pdf(request):
-   # some code
    file_data = request.POST["txtareaField"]
    
    if request.POST.get("txt"):
        response = HttpResponse(file_data, content_type='application/text charset=utf-8')
-       response['Content-Disposition'] = 'attachment; filename="text.txt"'
-   if request.POST.get("pdf"):
-       response = HttpResponse(file_data, content_type='application/pdf')
-       response['Content-Disposition'] = 'attachment; filename=%s' % 'text.pdf'
-   if request.POST.get("docs"):
-       response = HttpResponse(file_data, content_type='application/docs')
-       response['Content-Disposition'] = 'attachment; filename="text.docs"'
+       response['Content-Disposition'] = 'attachment; filename="download.txt"'
+       return response
 
-   return response
+   if request.POST.get("pdf"):
+       os.remove("ocr/static/ocr/img/download.pdf")
+       document=FPDF()
+       document.add_page()
+       document.set_font("Arial", size=15)
+       document.cell(200, 10, txt=file_data, ln=1, align="L")
+       document.output("ocr/static/ocr/img/download.pdf")
+       document=FPDF(orientation='P', unit='mm', format='A3')
+       print("pdf has been created successfully....")
+       file = open('ocr/static/ocr/img/download.pdf', 'rb')
+       response = FileResponse(file)
+       response['Content-Type'] = 'application/application/pdf'
+       response['Content-Disposition'] = 'attachment;filename=download.pdf'  # This file name is the default file name when downloading and can be changed
+       
+       #this will open file in new tab to read
+       #response = FileResponse(open('ocr/static/ocr/img/download.pdf', 'rb'))
+       return response
+   
+   if request.POST.get("docx"):
+       os.remove("ocr/static/ocr/img/download.docx")
+       document = Document()
+       document.add_paragraph(file_data, style='IntenseQuote')
+       document.save('ocr/static/ocr/img/download.docx')
+       response = HttpResponse(content_type='application/vnd.openxmlformats-officedocument.wordprocessingml.document')
+       response['Content-Disposition'] = 'attachment; filename=download.docx'
+       document.save(response)
+       return response
+       
+   
 
 def homepage(request):
     bool = "false"
@@ -34,22 +61,22 @@ def homepage(request):
         bool="true"
     
     context = {'form': UserFileForm(),'bool':bool}
-    if request.method == 'POST':
-        user_input = UserFileForm(request.POST, request.FILES)
-        if user_input.is_valid():
-            fileobj = request.FILES['userfile']
-            lang = user_input.cleaned_data['lang']
-            is_image = fileobj.name.endswith(('jpg', 'png', 'jpeg', 'tiff'))
-            if is_image:
-                multi = False
-            else:
-                multi = True
-            text = get_text(fileobj, lang, multi)
-            context['text'] = text
-            return render(request, 'ocr/index.html', context)
-        else:
-           context['form_error'] = 'Error! File can not be converted for recognition'
-           return render(request, 'ocr/index.html', context)
+    #if request.method == 'POST':
+        # user_input = UserFileForm(request.POST, request.FILES)
+        # if user_input.is_valid():
+        #     fileobj = request.FILES['userfile']
+        #     lang = user_input.cleaned_data['lang']
+        #     is_image = fileobj.name.endswith(('jpg', 'png', 'jpeg', 'tiff'))
+        #     if is_image:
+        #         multi = False
+        #     else:
+        #         multi = True
+        #     text = get_text(fileobj, lang, multi)
+    context['text'] = "hello shubham, testing word file"
+    return render(request, 'ocr/index.html', context)
+        #else:
+    context['form_error'] = 'Error! File can not be converted for recognition'
+    return render(request, 'ocr/index.html', context)
 
     
     
@@ -113,4 +140,14 @@ def userSignup(request):
         return render(request, 'ocr/error404.html')
 
 def ContactUs(request):
+    if request.method == "POST":
+        name = request.POST.get('txtName')
+        email = request.POST.get('txtEmail')
+        phone = request.POST.get('txtPhone')
+        msg = request.POST.get('txtMsg')
+        print(name, email, phone, msg)
+        contact = ContactUs(name=name, email=email, phone=phone, desc=msg)
+        contact.save()
+        messages.info(request, 'We got your query. we will look at soon.')
+        return render(request,'ocr/contactus.html')
     return render(request,'ocr/contactus.html')

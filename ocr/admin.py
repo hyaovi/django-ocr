@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import FileModel
+from .models import FileModel,ContactUs
 
 admin.site.register(FileModel)
-# Register your models here.
+admin.site.register(ContactUs)

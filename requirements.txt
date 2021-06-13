@@ -24,3 +24,5 @@ toml==0.10.1
 traitlets==4.3.3
 wcwidth==0.2.4
 reportlab
+fpdf
+python-docx
