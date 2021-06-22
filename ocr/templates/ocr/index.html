@@ -30,7 +30,7 @@
           </div>
           <p> Extract text from PDF and images files (JPG, BMP, TIFF, GIF)</p>
           {% endif %}
-          <button class="btn btn-custom btn-cta">
+          <button name="extractBtn" type="submit"class="btn btn-success">
             Extract text
           </button>
         </form>
@@ -63,12 +63,39 @@
 </div>
 </form>
 
+<br>
+<br>
+<div class="row">
+<div class="col-md-6"><h4 style="text-align:center;margin-left:200px;margin-bottom:100px;">translate text one language to another</h4></div>
+<div class="col-md-6">
+
+<form action="" method="post">
+{% csrf_token %}
+<select style="text-align:center;margin-left:20px;margin-bottom:50px;" name="lang">
+{% comment %} <option selected value="en">English</option> {% endcomment %}
+{%for attr,value in L.items %}
+<option value="{{attr}}">{{value}}</option>
+{% endfor %}
+</select>
+<textarea style="display:none;" name="txtareaField" >{{text}}</textarea>
+<button name="translateBtn" class="btn btn-success" style="margin-left:100px;" type="submit">Translate</button>
+</form>
+</div>
+</div>
+
 <script>
   function copy() {
     let text = document.querySelector('#text').select()
     document.execCommand('copy')
   }
 </script>
+{% endif %}
+
+{% if transletedText %}
+
+<center>
+<textarea style="margin-bottom:30px;"id="text" cols="140" rows="7">{{transletedText }}</textarea>
+</center>
 {% endif %}
 
 {%endifequal%}

@@ -22,7 +22,26 @@ import pytesseract as pt
 import PIL
 from PIL import Image
 pt.pytesseract.tesseract_cmd = r"C:\Program Files\Tesseract-OCR\tesseract.exe"
-#from googletrans import Translator
+from google_trans_new import google_translator
+from django.utils.datastructures import MultiValueDictKeyError
+
+LANGUAGES = {
+    'af': 'afrikaans',  'sq': 'albanian',    'am': 'amharic',    'ar': 'arabic',    'hy': 'armenian',    'az': 'azerbaijani',    'eu': 'basque',
+    'be': 'belarusian',    'bn': 'bengali',    'bs': 'bosnian',    'bg': 'bulgarian',    'ca': 'catalan',    'ceb': 'cebuano',    'ny': 'chichewa',
+    'zh-cn': 'chinese (simplified)',    'zh-tw': 'chinese (traditional)',    'co': 'corsican',    'hr': 'croatian',    'cs': 'czech',    'da': 'danish',
+    'nl': 'dutch',    'en': 'english',    'eo': 'esperanto',    'et': 'estonian',    'tl': 'filipino',    'fi': 'finnish',    'fr': 'french',
+    'fy': 'frisian',    'gl': 'galician',    'ka': 'georgian',    'de': 'german',    'el': 'greek',    'gu': 'gujarati',    'ht': 'haitian creole',
+    'ha': 'hausa',    'haw': 'hawaiian',    'iw': 'hebrew',    'he': 'hebrew',    'hi': 'hindi',    'hmn': 'hmong',    'hu': 'hungarian',
+    'is': 'icelandic',    'ig': 'igbo',    'id': 'indonesian',    'ga': 'irish',    'it': 'italian',    'ja': 'japanese',    'jw': 'javanese',
+    'kn': 'kannada',    'kk': 'kazakh',    'km': 'khmer',    'ko': 'korean',    'ku': 'kurdish (kurmanji)',    'ky': 'kyrgyz',    'lo': 'lao',
+    'la': 'latin',    'lv': 'latvian',    'lt': 'lithuanian',    'lb': 'luxembourgish',    'mk': 'macedonian',    'mg': 'malagasy',    'ms': 'malay',
+    'ml': 'malayalam',    'mt': 'maltese',    'mi': 'maori',    'mr': 'marathi',    'mn': 'mongolian',    'my': 'myanmar (burmese)',    'ne': 'nepali',
+    'no': 'norwegian',    'or': 'odia',    'ps': 'pashto',    'fa': 'persian',    'pl': 'polish',    'pt': 'portuguese',    'pa': 'punjabi',    'ro': 'romanian',
+    'ru': 'russian',    'sm': 'samoan',    'gd': 'scots gaelic',    'sr': 'serbian',    'st': 'sesotho',    'sn': 'shona',    'sd': 'sindhi',
+    'si': 'sinhala',    'sk': 'slovak',    'sl': 'slovenian',    'so': 'somali',    'es': 'spanish',    'su': 'sundanese',    'sw': 'swahili',
+    'sv': 'swedish',    'tg': 'tajik',    'ta': 'tamil',    'te': 'telugu',    'th': 'thai',    'tr': 'turkish',    'uk': 'ukrainian',    'ur': 'urdu',
+    'ug': 'uyghur',    'uz': 'uzbek',    'vi': 'vietnamese',    'cy': 'welsh',    'xh': 'xhosa',    'yi': 'yiddish',    'yo': 'yoruba',    'zu': 'zulu',
+}
 
 #get text and serve to download in 3 file formates
 
@@ -48,11 +67,11 @@ def download_pdf(request):
        response = FileResponse(file)
        response['Content-Type'] = 'application/application/pdf'
        response['Content-Disposition'] = 'attachment;filename=download.pdf'  # This file name is the default file name when downloading and can be changed
-       
+
        #this will open file in new tab to read
        #response = FileResponse(open('ocr/static/ocr/img/download.pdf', 'rb'))
        return response
-   
+
    if request.POST.get("docx"):
        if os.path.exists('ocr/static/ocr/img/download.docx'):
         os.remove("ocr/static/ocr/img/download.docx")
@@ -63,16 +82,15 @@ def download_pdf(request):
        response['Content-Disposition'] = 'attachment; filename=download.docx'
        document.save(response)
        return response
-       
-   
+
 
 def homepage(request):
     bool = "false"
     if request.user.is_authenticated:
         bool="true"
-    
-    context = {'form': UserFileForm(),'bool':bool}
-    if request.method == 'POST':
+
+    context = {'form': UserFileForm(),'bool':bool,"L":LANGUAGES }
+    if request.method=='POST' and UserFileForm(request.POST, request.FILES).is_valid():
         user_input = UserFileForm(request.POST, request.FILES)
         if user_input.is_valid():
             fileobj = request.FILES['userfile']
@@ -90,6 +108,14 @@ def homepage(request):
         else:
             context['form_error'] = 'Error! File can not be converted for recognition'
             return render(request, 'ocr/index.html', context)
+    elif request.method=='POST':
+        file_data = request.POST["txtareaField"]
+        Language = request.POST.get("lang", None)
+        translator = google_translator()  
+        translate_text = translator.translate(file_data,lang_tgt=Language)
+        context['text'] = file_data
+        context['transletedText'] =  translate_text
+        # print(translate_text)
 
     return render(request, 'ocr/index.html', context)
 
@@ -139,7 +165,7 @@ def userSignup(request):
         try:
             user= User.objects.get(username=username)
             messages.info(request, 'Your username is not unique. try another one')
-            return redirect('homepage') 
+            return redirect('homepage')
         except User.DoesNotExist:
             myuser = User.objects.create_user(username, email, pass1)
             myuser.first_name = fname
@@ -147,7 +173,7 @@ def userSignup(request):
             myuser.save()
             login(request, myuser)
             messages.info(request, 'Welcome to Django-ocr app! You have created your account successfully')
-            return redirect('homepage')      
+            return redirect('homepage')
     else:
         return render(request, 'ocr/error404.html')
 

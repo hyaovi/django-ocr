@@ -26,3 +26,5 @@ wcwidth==0.2.4
 reportlab
 fpdf
 python-docx
+google_trans_new
+requests
