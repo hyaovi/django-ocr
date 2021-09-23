@@ -55,7 +55,10 @@
 
 <form action="/download_my_pdf" method="post" target="_blank">
 {% csrf_token %}
-<div style="margin:30px">
+<div style="margin:30px"> 
+
+<!--download buttons -->
+
 <textarea style="display:none;" name="txtareaField" >{{text}}</textarea>
 <input style="margin:2px 140px 2px " type="submit" name="txt" value="Download Text File" class="btn btn-success" >
 <input style="margin:2px 140px 2px " type="submit" name="pdf" value="Download Pdf File" class="btn btn-success"  >

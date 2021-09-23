@@ -10,6 +10,7 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/3.0/ref/settings/
 """
 
+from pathlib import Path
 import os
 from django.utils.translation import ugettext_lazy as _
 import django_heroku
@@ -24,9 +25,9 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = '$s$@hxpy_!izlwlr^@d_ww+b!qe7*^p&5(hjt_-ua_ya+_sdn='
-DEFAULT_AUTO_FIELD='django.db.models.AutoField' 
+DEFAULT_AUTO_FIELD = 'django.db.models.AutoField'
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+DEBUG = True
 
 ALLOWED_HOSTS = ['djangoextractorandtranslator.herokuapp.com']
 
@@ -118,7 +119,6 @@ USE_L10N = True
 
 USE_TZ = True
 
-from pathlib import Path
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/3.0/howto/static-files/
@@ -129,7 +129,7 @@ STATIC_URL = '/static/'
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
-#email sent setup
+# email sent setup
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_PORT = 587
@@ -140,5 +140,5 @@ EMAIL_HOST_PASSWORD = 'Your email passowrd'
 django_heroku.settings(locals())
 
 
-#https://myaccount.google.com/lesssecureapps
-#go at this link and allow here to send emails from your email account to user
+# https://myaccount.google.com/lesssecureapps
+# go at this link and allow here to send emails from your email account to user
