@@ -2,7 +2,7 @@ asgiref==3.2.7
 autopep8==1.5.3
 backcall==0.2.0
 decorator==4.4.2
-Django==3.2.4
+Django==3.2.12
 ipython==7.15.0
 ipython-genutils==0.2.0
 jedi==0.17.0
